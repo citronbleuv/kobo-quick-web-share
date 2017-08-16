@@ -1,0 +1,60 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0px;
+    padding: 0px 0px 0px 0px;
+}
+.area {
+    margin: 0px;
+    padding: 5px 5px;
+}
+.up-area {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 50%;
+}
+.down-area {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 50%;
+}
+
+.ingredients {
+    position: fixed;
+    z-index: 999;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 30%;
+    border-bottom: 1px solid #bbb;
+}
+
+.steps {
+    background-color: #eee;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 60%;
+    background-color: #fff;
+}
+.ingredients-area {
+    overflow: hidden;
+    font-size: 0.9rem;
+}
+.steps-area {
+    overflow: hidden;
+    height: 100%;
+    font-size: 0.9rem;
+}
+.nbperson {
+    position: fixed;
+    top: 6px;
+    right: 15px;
+    z-index: 999;
+}
