@@ -1,0 +1,28 @@
+version: '2'
+services:
+    php:
+        build: 
+            context: .
+            dockerfile: docker/php7-fpm/Dockerfile
+            args:
+                uid: ${USER_UID} 
+                gid: ${USER_GID} 
+        volumes:
+        - ${SRC_PATH}:/var/www/symfony
+        environment:
+            FORCE_CHOWN_WWW: ${FORCE_CHOWN_WWW}
+    nginx:
+        build: 
+            context: .
+            dockerfile: docker/nginx/Dockerfile
+            args:
+                uid: ${USER_UID} 
+                gid: ${USER_GID} 
+        volumes:
+        - logs_nginx:/var/log/nginx
+        ports:
+        - ${PORT}:80
+        volumes_from:
+        - php
+volumes:
+    logs_nginx:
