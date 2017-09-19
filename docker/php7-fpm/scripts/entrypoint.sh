@@ -3,7 +3,7 @@ set -e
 
 if [[ ! -f /firstrun ]]; then 
 
-    mkdir /var/www/symfony/data
+    mkdir -p /var/www/symfony/data
 
     if [ "$FORCE_CHOWN_WWW" = true ]; then
 
