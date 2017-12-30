@@ -3,11 +3,24 @@ FROM php:7.1.8-fpm
 
 MAINTAINER Anthony PAUSE <anthony.pause@gmail.com>
 
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip
+# Install Packages
+RUN set -x && \
+    apt-get update && \
+    apt-get -y upgrade && \
+    apt-get -y install --no-install-recommends git
 
-RUN pecl install xdebug
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer --version
+
+# Install Gosu
+RUN gpg --keyserver pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+    && curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" \
+    && curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64.asc" \
+    && gpg --verify /usr/local/bin/gosu.asc \
+    && rm /usr/local/bin/gosu.asc \
+    && rm -r /root/.gnupg/ \
+    && chmod +x /usr/local/bin/gosu
 
 # Args
 ARG uid
@@ -22,39 +35,11 @@ RUN rm /etc/localtime && \
     ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
     "date"
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer --version
-
-# Type docker-php-ext-install to see available extensions
-RUN docker-php-ext-install pdo pdo_mysql && \
-    docker-php-ext-enable xdebug 
-
-# NPM and gulp install
-RUN apt-get update && apt-get install -y npm && \
-	npm install -g gulp && \
-	npm install -g bower
-
-# Config xdebug
-RUN echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
-# Alias
-RUN echo 'alias sf="php app/console"' >> ~/.bashrc && \
-    echo 'alias sf3="php bin/console"' >> ~/.bashrc
-
-# Scripts
-ADD docker/php7-fpm/scripts /scripts
-RUN chmod +x /scripts/*;
+# Prepare
+ADD docker/php7-fpm/prepare /prepare
+RUN chmod +x /prepare/*;
 
 WORKDIR /var/www/symfony
 
-ENV FORCE_CHOWN_WWWW=false
-
-ENTRYPOINT ["/scripts/entrypoint.sh"]
+ENTRYPOINT ["/prepare/run.sh"]
 CMD ["php-fpm"]
